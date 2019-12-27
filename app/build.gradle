@@ -1,16 +1,31 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+
+publish {
+    def groupProjectID = 'anton-shinkaretsky'
+    def artifactProjectID = 'input-formatter'
+    def publishVersionID = '0.0.1'
+
+    userOrg = 'AntonShinkaretsky'
+    repoName = 'InputFormatter'
+    groupId = groupProjectID
+    artifactId = artifactProjectID
+    publishVersion = publishVersionID
+    desc = 'No description yet'
+    website = 'https://github.com/AntonShinkaretsky/InputFormatter'
+}
 
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
-        applicationId "com.anton.shinkaretsky.input.formatter.app"
         minSdkVersion 15
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
