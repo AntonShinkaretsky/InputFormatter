@@ -2,7 +2,8 @@ package com.anton.shinkaretsky.input.formatter.app
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.anton.shinkaretsky.input.formatter.inputformatter.separate
+import com.anton.shinkaretsky.input.formatter.inputformatter.format.money.setCurrencyFormatter
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -10,7 +11,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        "22222".separate("-", intArrayOf(2,2,2))
+        edit.setCurrencyFormatter(" ", ",")
     }
 
 }

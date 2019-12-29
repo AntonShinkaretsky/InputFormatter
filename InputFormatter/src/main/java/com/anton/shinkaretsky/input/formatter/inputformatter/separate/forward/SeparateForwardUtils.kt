@@ -1,58 +1,20 @@
-package com.anton.shinkaretsky.input.formatter.inputformatter
+package com.anton.shinkaretsky.input.formatter.inputformatter.separate.forward
 
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.EditText
-import java.lang.StringBuilder
+import com.anton.shinkaretsky.input.formatter.inputformatter.separate.containsSeparators
 
-// Formats EditText, based on passed pattern
-// E.g. for a string "12345678" and a group intArrayOf(1,2,3,2) result would be "1 23 456 78"
-fun EditText.separate(separator: String, groups: IntArray) {
-
-    val edit = this
-
-    edit.addTextChangedListener(object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-
-            // Formatted string (changes only if doesn't have correct format already)
-            val string = s.toString().separate(separator, groups)
-
-            // If current EditText string doesn't have correct format, change with formatted
-            if (s.toString() != string) {
-                edit.setText(string)
-
-                // And place cursor into correct place
-                val place = calculateCursorPlacement(s.toString(), start, count, separator, groups)
-                edit.setSelection(place)
-            }
-        }
-
-        override fun afterTextChanged(s: Editable) {}
-    })
-}
-
-private fun calculateCursorPlacement(string: String, start: Int, count: Int, separator: String, groups: IntArray): Int {
-    val clearCount = string.substring(start, start + count).replace(separator, "").length
-    val clearStart = string.substring(0, start).replace(separator, "").length
-    val sepExp = separatorsExpected(clearStart + clearCount, groups)
-    return clearCount + clearStart + (separator.length * sepExp)
-}
-
-// Formats string, based on passed pattern. Existing separators ignored
+// Formats string, based on passed pattern. Existing separators cleared
 // E.g. for a string "12345678" and a group intArrayOf(1,2,3,2) result would be "1 23 456 78"
 // E.g. for a string "123 4 5678" and a group intArrayOf(1,2,3,2) result would be "1 23 456 78"
-fun String.separate(separator: String, groups: IntArray): String {
-
-    var string = this
-
-    // If current text doesn't have correct formatting
-    if (!this.correctFormat(separator, groups)) {
+fun String.separateForward(separator: String, groups: IntArray): String {
+    return if (!isCorrectlySeparatedForward(separator, groups)) {
 
         val clearString = this.clearAllSymbols(separator)
         val clearLength = clearString.length
-        val separatorsExpected = separatorsExpected(clearLength, groups)
+        val separatorsExpected =
+            separatorsForwardExpected(
+                clearLength,
+                groups
+            )
 
         // Initialize default string
         val result = StringBuilder()
@@ -82,15 +44,15 @@ fun String.separate(separator: String, groups: IntArray): String {
             result.append("$head$separator$tail")
         }
 
-        string = result.toString()
+        result.toString()
+    } else {
+        this
     }
-
-    return string
 }
 
-private fun String.clearAllSymbols(separator: String): String {
+internal fun String.clearAllSymbols(chars: String): String {
     var result = this
-    for (char in separator) {
+    for (char in chars) {
         result = result.replace(char.toString(), "")
     }
     return result
@@ -101,7 +63,7 @@ private fun String.clearAllSymbols(separator: String): String {
 // For a string "1 23 45 678" result == false
 // For a string "1 23 456 78 " result == false
 // For a string "1 23 456 78" result == true
-private fun String.correctFormat(separator: String, groups: IntArray): Boolean {
+internal fun String.isCorrectlySeparatedForward(separator: String, groups: IntArray): Boolean {
 
     // Creating array of indexes, where separators should be placed
     val separatorPlaces = ArrayList<Int>()
@@ -144,19 +106,19 @@ private fun String.correctFormat(separator: String, groups: IntArray): Boolean {
     // If there are more separators than expected, formatting is incorrect
     val clearString = this.replace(separator, "")
     val clearLength = clearString.length
-    if (this.containsSeparators(separator) > separatorsExpected(clearLength, groups)) return false
+    if (this.containsSeparators(separator) > separatorsForwardExpected(
+            clearLength,
+            groups
+        )
+    ) return false
 
     // Otherwise everything is ok
     return true
 }
 
-private fun String.containsSeparators(separator: String): Int {
-    return Regex(separator).findAll(this).count()
-}
-
 // Counts, how many separators should be in a string, to split it for passed groups
 // E.g. for a string "1 23 456 78" and a group intArrayOf(1,2,3,2) result == 3
-private fun separatorsExpected(clearLength: Int, groups: IntArray): Int {
+internal fun separatorsForwardExpected(clearLength: Int, groups: IntArray): Int {
 
     // Represents current group
     // E.g. for a group intArrayOf(1,2,3,2) results would be 1,2,3,4

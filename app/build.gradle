@@ -1,22 +1,6 @@
-apply plugin: 'com.novoda.bintray-release'
-apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
+apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-
-publish {
-    def groupProjectID = 'anton-shinkaretsky'
-    def artifactProjectID = 'input-formatter'
-    def publishVersionID = '0.0.1'
-
-    userOrg = 'AntonShinkaretsky'
-    repoName = 'InputFormatter'
-    groupId = groupProjectID
-    artifactId = artifactProjectID
-    publishVersion = publishVersionID
-    desc = 'No description yet'
-    website = 'https://github.com/AntonShinkaretsky/InputFormatter'
-}
 
 android {
     compileSdkVersion 29
@@ -37,13 +21,20 @@ android {
 }
 
 dependencies {
+
+    // Main
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+
+    // Module
+    implementation project(path: ':InputFormatter')
+
+    // Tests
     testImplementation 'junit:junit:4.12'
+    testImplementation 'androidx.arch.core:core-testing:2.1.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation project(path: ':InputFormatter')
 }
